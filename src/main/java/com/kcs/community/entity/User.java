@@ -44,10 +44,13 @@ public class User extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public User(String email, String password, String nickname, String profileUrl) {
+    public User(Long id, String email, String password, String nickname, String profileUrl) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.profileUrl = profileUrl;
     }
+
+
 }

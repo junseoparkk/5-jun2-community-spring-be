@@ -23,10 +23,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class JwtTokenProvider {
-    @Value("${jwt.secret")
+    @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expirationTimeMs")
+    @Value("${jwt.expirationTimeMs}")
     private long expirationTimeMs;
 
     // 토큰 생성 로직

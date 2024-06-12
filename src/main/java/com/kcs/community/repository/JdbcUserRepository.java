@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -22,7 +23,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Long saveUser(User user) {
-        String sql = "INSERT INTO users (email, password, nickname, profile_url) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, password, nickname, profile_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -31,7 +32,9 @@ public class JdbcUserRepository implements UserRepository {
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getNickname());
             ps.setString(4, user.getProfileUrl());
-            //ps.setTimestamp(6, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setTimestamp(5, Timestamp.valueOf(user.getCreatedAt().withNano(0)));
+            ps.setTimestamp(6, Timestamp.valueOf(user.getUpdatedAt().withNano(0)));
+
             return ps;
         }, keyHolder);
 
@@ -41,19 +44,34 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(Long userId) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, userId));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, userId));
+        } catch (EmptyResultDataAccessException e) {
+            log.error("findById: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, email));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, email));
+        } catch (EmptyResultDataAccessException e) {
+            log.error("findByEmail: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override
     public Optional<User> findByNickname(String nickname) {
         String sql = "SELECT * FROM users WHERE nickname = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, nickname));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, nickname));
+        } catch (EmptyResultDataAccessException e) {
+            log.error("findByNickname: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override

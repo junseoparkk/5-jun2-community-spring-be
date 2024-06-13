@@ -1,5 +1,6 @@
 package com.kcs.community.repository;
 
+import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ public class UserRowMapper implements RowMapper<User> {
                 .password(rs.getString("password"))
                 .nickname(rs.getString("nickname"))
                 .profileUrl(rs.getString("profile_url"))
+                .role(RoleType.valueOf(rs.getString("role")))
                 .build();
     }
 }

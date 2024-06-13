@@ -23,8 +23,10 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Long saveUser(User user) {
-        String sql = "INSERT INTO users (email, password, nickname, profile_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, password, nickname, profile_url, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
+        log.info("email:{}, password:{}, nickname:{}, role: {}, created:{}, updated:{}", user.getEmail(), user.getPassword(),
+                user.getNickname(), user.getRole().name(), user.getCreatedAt(), user.getUpdatedAt());
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -32,8 +34,9 @@ public class JdbcUserRepository implements UserRepository {
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getNickname());
             ps.setString(4, user.getProfileUrl());
-            ps.setTimestamp(5, Timestamp.valueOf(user.getCreatedAt().withNano(0)));
-            ps.setTimestamp(6, Timestamp.valueOf(user.getUpdatedAt().withNano(0)));
+            ps.setString(5, user.getRole().name());
+            ps.setTimestamp(6, Timestamp.valueOf(user.getCreatedAt().withNano(0)));
+            ps.setTimestamp(7, Timestamp.valueOf(user.getUpdatedAt().withNano(0)));
 
             return ps;
         }, keyHolder);

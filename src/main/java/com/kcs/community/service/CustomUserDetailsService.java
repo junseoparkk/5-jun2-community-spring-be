@@ -1,7 +1,9 @@
 package com.kcs.community.service;
 
+import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,18 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails findUser = userRepository.findByEmail(username)
-                .map(this::generateUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException("Not Exist User"));
-        log.info("findUser: {}, password: {}, authorities: {}", findUser.getUsername(), findUser.getPassword(), findUser.getAuthorities());
-        return findUser;
-    }
-
-    private UserDetails generateUserDetails(User user) {
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().name())
-                .build();
+        Optional<User> user = userRepository.findByEmail(username);
+        return user.map(CustomUserDetails::new).orElse(null);
     }
 }

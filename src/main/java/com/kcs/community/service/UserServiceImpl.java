@@ -1,8 +1,5 @@
 package com.kcs.community.service;
 
-import com.kcs.community.auth.JwtToken;
-import com.kcs.community.auth.JwtTokenProvider;
-import com.kcs.community.dto.user.LoginRequest;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.entity.RoleType;
@@ -12,9 +9,6 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
@@ -47,25 +39,6 @@ public class UserServiceImpl implements UserService {
 
         log.info("signup success - email: {}, nickname: {}, role: {}", user.getEmail(), user.getNickname(), user.getRole());
         return new SignupResponse(user.getEmail(), user.getNickname());
-    }
-
-    @Override
-    @Transactional
-    public JwtToken login(LoginRequest request) {
-        String username = request.email();
-        String password = request.password();
-
-        UsernamePasswordAuthenticationToken authenticationToken
-                = new UsernamePasswordAuthenticationToken(username, password);
-        log.info("authenticationToken: {}", authenticationToken);
-
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        log.info("authentication: {}", authentication);
-
-        JwtToken token = jwtTokenProvider.generateToken(authentication);
-        log.info("token: {}", token);
-
-        return token;
     }
 
     private void validateDuplicatedInfo(SignupRequest request) {

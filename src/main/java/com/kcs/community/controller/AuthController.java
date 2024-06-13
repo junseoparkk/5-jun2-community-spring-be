@@ -1,7 +1,5 @@
 package com.kcs.community.controller;
 
-import com.kcs.community.auth.JwtToken;
-import com.kcs.community.dto.user.LoginRequest;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.service.UserService;
@@ -17,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class UserController {
+public class AuthController {
     private final UserService userService;
 
     @PostMapping("/signup")
@@ -31,15 +29,6 @@ public class UserController {
             log.error("signup: {}", e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<JwtToken> login(@RequestBody LoginRequest request) {
-        JwtToken jwtToken = userService.login(request);
-
-        log.info("request email={}, password={}", request.email(), request.password());
-        log.info("jwtToken accessToken={}, refreshToken={}", jwtToken.accessToken(), jwtToken.refreshToken());
-        return new ResponseEntity<>(jwtToken, HttpStatus.OK);
     }
 
     @GetMapping("/test")

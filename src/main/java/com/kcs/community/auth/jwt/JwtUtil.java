@@ -2,20 +2,21 @@ package com.kcs.community.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.Jwts.SIG;
+import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class JwtUtil {
     private SecretKey secretKey;
 
     public JwtUtil(@Value("${jwt.secret}")String secret) {
-        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String getUsername(String token) {
@@ -42,15 +43,18 @@ public class JwtUtil {
         return Jwts.builder()
                 .claim("category", category)
                 .claim("username", username)
-                .claim("role", role).issuedAt(new Date(System.currentTimeMillis()))
+                .claim("role", role)
+                .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(secretKey, SIG.HS256)
                 .compact();
     }
 
     private Claims getClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
-                .build().parseSignedClaims(token).getPayload();
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

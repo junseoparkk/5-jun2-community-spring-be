@@ -57,8 +57,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request
                                 .requestMatchers("/api/auth/signup", "/api/auth/login", "/error").permitAll()
-                                .requestMatchers("/api/auth/test").hasRole("USER")
-                                .requestMatchers("reissue").permitAll()
+                                .requestMatchers("/reissue").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository),

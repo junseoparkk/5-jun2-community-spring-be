@@ -2,10 +2,13 @@ package com.kcs.community.service;
 
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
+import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.UserRepository;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -38,7 +41,22 @@ public class UserServiceImpl implements UserService {
         userRepository.saveUser(user);
 
         log.info("signup success - email: {}, nickname: {}, role: {}", user.getEmail(), user.getNickname(), user.getRole());
+        // TO-BE builder 변경 예정
         return new SignupResponse(user.getEmail(), user.getNickname());
+    }
+
+    @Override
+    public UserInfoDto findByEmail(String email) {
+        Optional<User> findUser = userRepository.findByEmail(email);
+        if (findUser.isPresent()) {
+            User user = findUser.get();
+            return UserInfoDto.builder()
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .profileUrl(user.getProfileUrl())
+                    .build();
+        }
+        throw new NoSuchElementException("Not Exist User");
     }
 
     private void validateDuplicatedInfo(SignupRequest request) {

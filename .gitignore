@@ -40,6 +40,9 @@ out/
 application.yml
 application-test.yml
 
-# QueryDSL generated sources
+### QueryDSL generated sources
 generated/
 target/generated-sources/
+
+### resources
+src/main/resources/

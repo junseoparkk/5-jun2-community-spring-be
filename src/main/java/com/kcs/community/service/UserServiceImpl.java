@@ -46,15 +46,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfoDto findByEmail(String email) {
+    public User findByEmail(String email) {
         Optional<User> findUser = userRepository.findByEmail(email);
         if (findUser.isPresent()) {
-            User user = findUser.get();
-            return UserInfoDto.builder()
-                    .email(user.getEmail())
-                    .nickname(user.getNickname())
-                    .profileUrl(user.getProfileUrl())
-                    .build();
+            return findUser.get();
         }
         throw new NoSuchElementException("Not Exist User");
     }

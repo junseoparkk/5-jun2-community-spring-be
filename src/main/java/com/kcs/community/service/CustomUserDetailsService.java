@@ -2,7 +2,7 @@ package com.kcs.community.service;
 
 import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.entity.User;
-import com.kcs.community.repository.UserRepository;
+import com.kcs.community.repository.user.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

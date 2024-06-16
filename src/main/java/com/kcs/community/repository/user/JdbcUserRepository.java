@@ -1,4 +1,4 @@
-package com.kcs.community.repository;
+package com.kcs.community.repository.user;
 
 import com.kcs.community.entity.User;
 import java.sql.PreparedStatement;

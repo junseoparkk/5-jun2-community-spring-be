@@ -2,10 +2,9 @@ package com.kcs.community.service;
 
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
-import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
-import com.kcs.community.repository.UserRepository;
+import com.kcs.community.repository.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;

@@ -39,6 +39,7 @@ public class AuthController {
     public ResponseEntity<UserInfoDto> test(@AuthenticationPrincipal CustomUserDetails userDetails) {
         User findUser = userService.findByEmail(userDetails.getUsername());
         UserInfoDto dto = UserInfoDto.builder()
+                .id(findUser.getId())
                 .email(findUser.getEmail())
                 .nickname(findUser.getNickname())
                 .profileUrl(findUser.getProfileUrl())

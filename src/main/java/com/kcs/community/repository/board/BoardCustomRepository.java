@@ -1,7 +1,7 @@
-package com.kcs.community.repository;
+package com.kcs.community.repository.board;
 
-import com.kcs.community.entity.Board;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface BoardCustomRepository {
-    Long saveBoard(Board board);
 }

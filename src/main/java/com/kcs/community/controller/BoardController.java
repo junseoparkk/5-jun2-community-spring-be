@@ -6,6 +6,7 @@ import com.kcs.community.entity.User;
 import com.kcs.community.service.BoardService;
 import com.kcs.community.service.UserService;
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +52,9 @@ public class BoardController {
     }
 
     @GetMapping
-    public String findAllBoards() {
-        return "find all boards";
+    public ResponseEntity<List<BoardInfoDto>> findAllBoards() {
+        List<BoardInfoDto> boards = boardService.findAll();
+        return new ResponseEntity<>(boards, HttpStatus.OK);
     }
 
     @GetMapping("/{boardId}")

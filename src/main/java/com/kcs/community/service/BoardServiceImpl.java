@@ -7,6 +7,7 @@ import com.kcs.community.repository.board.BoardCustomRepository;
 import com.kcs.community.repository.board.BoardRepository;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +26,20 @@ public class BoardServiceImpl implements BoardService {
     public BoardInfoDto save(User user, String title, String content, MultipartFile image, String imagePath) throws IOException {
         UUID uuid = UUID.randomUUID();
         String originalName = image.getOriginalFilename();
-        String fileName = uuid + originalName;
-        File saveFile = new File(imagePath, fileName);
-        image.transferTo(saveFile);
+        String imageUrl = "";
+        log.info("imagePath: {}", imagePath);
 
-        log.info("original: {}, fileName: {}", originalName, fileName);
+        if (!image.isEmpty()) {
+            String fileName = uuid + originalName;
+            File saveFile = new File(imagePath, fileName);
+            image.transferTo(saveFile);
+            imageUrl = imagePath + fileName;
+        }
+
         Board board = Board.builder()
                 .title(title)
                 .content(content)
-                .imageUrl(imagePath)
+                .imageUrl(imageUrl)
                 .likeCount(0L)
                 .viewCount(0L)
                 .commentCount(0L)
@@ -41,5 +47,14 @@ public class BoardServiceImpl implements BoardService {
                 .build();
         Board savedBoard = boardRepository.save(board);
         return BoardInfoDto.mapToDto(savedBoard);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BoardInfoDto> findAll() {
+        List<Board> boards = boardRepository.findAll();
+        return boards.stream()
+                .map(BoardInfoDto::mapToDto)
+                .toList();
     }
 }

@@ -2,6 +2,7 @@ package com.kcs.community.service;
 
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
+import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.user.UserRepository;
@@ -45,10 +46,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByEmail(String email) {
+    public UserInfoDto findByEmail(String email) {
         Optional<User> findUser = userRepository.findByEmail(email);
         if (findUser.isPresent()) {
-            return findUser.get();
+            return UserInfoDto.mapToDto(findUser.get());
         }
         throw new NoSuchElementException("Not Exist User");
     }

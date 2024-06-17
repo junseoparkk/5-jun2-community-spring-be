@@ -4,7 +4,6 @@ import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.dto.user.UserInfoDto;
-import com.kcs.community.entity.User;
 import com.kcs.community.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,14 +36,9 @@ public class AuthController {
 
     @GetMapping("/test")
     public ResponseEntity<UserInfoDto> test(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        User findUser = userService.findByEmail(userDetails.getUsername());
-        UserInfoDto dto = UserInfoDto.builder()
-                .id(findUser.getId())
-                .email(findUser.getEmail())
-                .nickname(findUser.getNickname())
-                .profileUrl(findUser.getProfileUrl())
-                .build();
-        log.info("findUser email: {}, nickname: {}, profileUrl: {}", dto.email(), dto.nickname(), dto.profileUrl());
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+        UserInfoDto userDto = userService.findByEmail(userDetails.getUsername());
+
+        log.info("findUser email: {}, nickname: {}, profileUrl: {}", userDto.email(), userDto.nickname(), userDto.profileUrl());
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }

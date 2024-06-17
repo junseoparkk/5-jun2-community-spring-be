@@ -7,5 +7,5 @@ import com.kcs.community.entity.User;
 
 public interface UserService {
     SignupResponse signup(SignupRequest request) throws IllegalArgumentException;
-    User findByEmail(String email);
+    UserInfoDto findByEmail(String email);
 }

@@ -10,4 +10,5 @@ public interface UserService {
     SignupResponse signup(SignupRequest request) throws IllegalArgumentException;
     UserInfoDto findByEmail(String email);
     UserInfoDto updateInfo(UserInfoDto userDto, String nickname, MultipartFile profileImg);
+    UserInfoDto updatePassword(UserInfoDto userDto, String password);
 }

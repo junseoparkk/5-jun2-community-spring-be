@@ -42,4 +42,17 @@ public class UserController {
         UserInfoDto updatedUser = userService.updateInfo(findUser, nickname, profileImg);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
+
+    @PostMapping("/me/password")
+    public ResponseEntity<UserInfoDto> updateUserPassword(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestPart(name = "password", required = false) String password
+    ) {
+        UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
+        if (password == null) {
+            return new ResponseEntity<>(findUser, HttpStatus.OK);
+        }
+        UserInfoDto updatedUser = userService.updatePassword(findUser, password);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
 }

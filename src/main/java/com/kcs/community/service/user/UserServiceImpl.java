@@ -103,6 +103,28 @@ public class UserServiceImpl implements UserService {
         return UserInfoDto.mapToDto(saveUser);
     }
 
+    @Override
+    public UserInfoDto updatePassword(UserInfoDto userDto, String updatePassword) {
+        Optional<User> findUser = userRepository.findById(userDto.id());
+        if (findUser.isEmpty()) {
+            throw new NoSuchElementException("Not Exists User");
+        }
+
+        User user = findUser.get();
+        User saveUser = User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(updatePassword))
+                .nickname(user.getNickname())
+                .profileUrl(user.getProfileUrl())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now().withNano(0))
+                .role(user.getRole())
+                .build();
+        userRepository.updateUser(saveUser.getId(), saveUser);
+        return UserInfoDto.mapToDto(saveUser);
+    }
+
     private void validateDuplicatedInfo(String email, String nickname) {
         try {
             userRepository.existsByEmail(email);

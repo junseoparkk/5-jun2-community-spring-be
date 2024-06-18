@@ -42,12 +42,4 @@ public class AuthController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/test")
-    public ResponseEntity<UserInfoDto> test(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        UserInfoDto userDto = userService.findByEmail(userDetails.getUsername());
-
-        log.info("findUser email: {}, nickname: {}, profileUrl: {}", userDto.email(), userDto.nickname(), userDto.profileUrl());
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
-    }
 }

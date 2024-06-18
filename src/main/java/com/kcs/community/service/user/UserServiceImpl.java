@@ -34,7 +34,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SignupResponse signup(SignupRequest request) throws IllegalArgumentException {
         // 중복 이메일, 닉네임 확인 로직
-        validateDuplicatedInfo(request);
+        String email = request.email();
+        String nickname = request.nickname();
+
+        validateDuplicatedInfo(email, nickname);
         String profileUrl = null;
         try {
             profileUrl = generateProfileUrl(request.profileImg());
@@ -62,16 +65,48 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfoDto findByEmail(String email) {
         Optional<User> findUser = userRepository.findByEmail(email);
-        if (findUser.isPresent()) {
-            return UserInfoDto.mapToDto(findUser.get());
+        if (findUser.isEmpty()) {
+            throw new NoSuchElementException("Not Exists User");
         }
-        throw new NoSuchElementException("Not Exist User");
+        return UserInfoDto.mapToDto(findUser.get());
     }
 
-    private void validateDuplicatedInfo(SignupRequest request) {
+    @Override
+    public UserInfoDto updateInfo(UserInfoDto userDto, String updatedNickname, MultipartFile profileImg) {
+        Optional<User> findUser = userRepository.findById(userDto.id());
+        if (findUser.isEmpty()) {
+            throw new NoSuchElementException("Not Exists User");
+        }
+
+        // TO-BE 기존 프로필 이미지 삭제 로직 필요
+        String updatedProfileUrl = null;
         try {
-            userRepository.existsByEmail(request.email());
-            userRepository.existsByNickname(request.nickname());
+            updatedProfileUrl = generateProfileUrl(profileImg);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new IllegalArgumentException("Profile image upload failed");
+        }
+
+        User user = findUser.get();
+        User saveUser = User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .nickname(updatedNickname)
+                .profileUrl(updatedProfileUrl)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now().withNano(0))
+                .role(user.getRole())
+                .build();
+
+        userRepository.updateUser(saveUser.getId(), saveUser);
+        return UserInfoDto.mapToDto(saveUser);
+    }
+
+    private void validateDuplicatedInfo(String email, String nickname) {
+        try {
+            userRepository.existsByEmail(email);
+            userRepository.existsByNickname(nickname);
         } catch (EmptyResultDataAccessException e) {
             return;
         }

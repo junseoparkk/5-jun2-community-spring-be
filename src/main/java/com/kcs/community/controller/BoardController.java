@@ -2,6 +2,7 @@ package com.kcs.community.controller;
 
 import com.kcs.community.dto.board.BoardDetails;
 import com.kcs.community.dto.board.BoardInfoDto;
+import com.kcs.community.dto.board.CommentInfoDto;
 import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.entity.Board;
 import com.kcs.community.entity.User;
@@ -90,5 +91,11 @@ public class BoardController {
         BoardDetails findBoard = boardService.findById(boardId);
         commentService.save(findUser, findBoard, content);
         return "ok";
+    }
+
+    @GetMapping("/{boardId}/comments")
+    public ResponseEntity<List<CommentInfoDto>> findAllComments(@PathVariable(name = "boardId") Long boardId) {
+        List<CommentInfoDto> comments = commentService.findCommentsByBoardId(boardId);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 }

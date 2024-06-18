@@ -1,15 +1,18 @@
 package com.kcs.community.service;
 
 import com.kcs.community.dto.board.BoardDetails;
+import com.kcs.community.dto.board.CommentInfoDto;
 import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.entity.Board;
 import com.kcs.community.entity.Comment;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.board.BoardRepository;
-import com.kcs.community.repository.board.CommentRepository;
+import com.kcs.community.repository.comment.CommentRepository;
 import com.kcs.community.repository.user.UserRepository;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,5 +43,18 @@ public class CommentServiceImpl implements CommentService {
                 .content(content)
                 .build();
         commentRepository.save(comment);
+    }
+
+    @Override
+    public List<CommentInfoDto> findCommentsByBoardId(Long boardId) {
+        Optional<Board> findBoard = boardRepository.findById(boardId);
+        if (findBoard.isEmpty()) {
+            throw new NoSuchElementException("Not exists board");
+        }
+
+        List<Comment> findComments = commentRepository.findCommentsByBoardId(boardId);
+        return findComments.stream()
+                .map(CommentInfoDto::mapToDto)
+                .toList();
     }
 }

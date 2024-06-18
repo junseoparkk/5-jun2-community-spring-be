@@ -22,7 +22,7 @@ public class JdbcUserRepository implements UserRepository {
     private final UserRowMapper userRowMapper;
 
     @Override
-    public Long saveUser(User user) {
+    public Long save(User user) {
         String sql = "INSERT INTO users (email, password, nickname, profile_url, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         log.info("email:{}, password:{}, nickname:{}, role: {}, created:{}, updated:{}", user.getEmail(), user.getPassword(),

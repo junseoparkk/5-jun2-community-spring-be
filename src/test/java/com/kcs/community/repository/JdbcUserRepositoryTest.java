@@ -42,7 +42,7 @@ public class JdbcUserRepositoryTest {
                 .build();
 
         //when
-        Long userId = repository.saveUser(user);
+        Long userId = repository.save(user);
         User findUser = repository.findById(userId).get();
 
         //then
@@ -54,10 +54,10 @@ public class JdbcUserRepositoryTest {
     void findAllTest() {
         //given
         User user1 = generateTestUser(1);
-        repository.saveUser(user1);
+        repository.save(user1);
 
         User user2 = generateTestUser(2);
-        repository.saveUser(user2);
+        repository.save(user2);
 
         //when
         List<User> users = repository.findAll();
@@ -70,7 +70,7 @@ public class JdbcUserRepositoryTest {
     void updateUserTest() {
         //given
         User user = generateTestUser(1);
-        Long userId = repository.saveUser(user);
+        Long userId = repository.save(user);
 
         //when
         User updateUser = generateTestUser(2);
@@ -85,7 +85,7 @@ public class JdbcUserRepositoryTest {
     void deleteUserTest() {
         //given
         User user = generateTestUser(1);
-        Long userId = repository.saveUser(user);
+        Long userId = repository.save(user);
 
         //when
         repository.deleteUser(userId);

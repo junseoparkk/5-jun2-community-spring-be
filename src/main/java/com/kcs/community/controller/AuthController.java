@@ -4,7 +4,7 @@ import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.dto.user.UserInfoDto;
-import com.kcs.community.service.UserService;
+import com.kcs.community.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

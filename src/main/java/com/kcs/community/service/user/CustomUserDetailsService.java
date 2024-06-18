@@ -1,4 +1,4 @@
-package com.kcs.community.service;
+package com.kcs.community.service.user;
 
 import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.entity.User;

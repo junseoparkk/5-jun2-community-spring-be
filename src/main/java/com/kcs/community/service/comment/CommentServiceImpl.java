@@ -1,4 +1,4 @@
-package com.kcs.community.service;
+package com.kcs.community.service.comment;
 
 import com.kcs.community.dto.board.BoardDetails;
 import com.kcs.community.dto.board.CommentInfoDto;
@@ -12,7 +12,6 @@ import com.kcs.community.repository.user.UserRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

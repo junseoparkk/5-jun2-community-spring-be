@@ -1,4 +1,4 @@
-package com.kcs.community.service;
+package com.kcs.community.service.user;
 
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;

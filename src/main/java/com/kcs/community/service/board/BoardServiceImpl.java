@@ -1,11 +1,10 @@
-package com.kcs.community.service;
+package com.kcs.community.service.board;
 
 import com.kcs.community.dto.board.BoardDetails;
 import com.kcs.community.dto.board.BoardInfoDto;
 import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.entity.Board;
 import com.kcs.community.entity.User;
-import com.kcs.community.repository.board.BoardCustomRepository;
 import com.kcs.community.repository.board.BoardRepository;
 import com.kcs.community.repository.user.UserRepository;
 import java.io.File;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

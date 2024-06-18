@@ -1,4 +1,4 @@
-package com.kcs.community.service;
+package com.kcs.community.service.comment;
 
 import com.kcs.community.dto.board.BoardDetails;
 import com.kcs.community.dto.board.CommentInfoDto;

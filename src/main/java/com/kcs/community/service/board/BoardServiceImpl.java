@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import javax.security.sasl.AuthenticationException;
+import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,12 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
+    @Value("${spring.servlet.multipart.location}")
+    private String imagePath;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
 
     @Transactional
     @Override
-    public BoardInfoDto save(UserInfoDto user, String title, String content, MultipartFile image, String imagePath) throws IOException {
+    public BoardInfoDto save(UserInfoDto user, String title, String content, MultipartFile image) throws IOException {
         String imageUrl = generateImageUrl(image, imagePath);
         Optional<User> findUser = userRepository.findById(user.id());
 
@@ -68,6 +73,24 @@ public class BoardServiceImpl implements BoardService {
         }
         Board board = findBoard.get();
         return BoardDetails.mapToDto(board);
+    }
+
+    @Override
+    public BoardDetails update(Long id, Long userId, String title, String content, MultipartFile image)
+            throws IOException {
+        Optional<Board> findBoard = boardRepository.findById(id);
+        if (findBoard.isEmpty()) {
+            throw new NoSuchElementException("Board not exists");
+        }
+        Board board = findBoard.get();
+
+        if (!board.getUser().getId().equals(userId)) {
+            throw new AuthenticationException("Not valid user");
+        }
+        String imageUrl = generateImageUrl(image, imagePath);
+
+        board.update(title, content, imageUrl);
+        return BoardDetails.mapToDto(boardRepository.save(board));
     }
 
     private String generateImageUrl(MultipartFile image, String imagePath) throws IOException {

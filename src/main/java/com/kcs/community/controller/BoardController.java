@@ -7,6 +7,7 @@ import com.kcs.community.dto.user.UserInfoDto;
 import com.kcs.community.service.board.BoardService;
 import com.kcs.community.service.comment.CommentService;
 import com.kcs.community.service.user.UserService;
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/boards")
 @RequiredArgsConstructor
 public class BoardController {
-    @Value("${spring.servlet.multipart.location}")
-    private String imagePath;
     private final BoardService boardService;
     private final CommentService commentService;
     private final UserService userService;
@@ -45,9 +44,9 @@ public class BoardController {
             @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         UserInfoDto findUser = userService.findByEmail(user.getUsername());
 
-        log.info("user: {}, title: {}, content: {}, imagePath: {}", findUser.email(), title, content, imagePath);
+        log.info("user: {}, title: {}, content: {}", findUser.email(), title, content);
 
-        BoardInfoDto response = boardService.save(findUser, title, content, image, imagePath);
+        BoardInfoDto response = boardService.save(findUser, title, content, image);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -69,8 +68,20 @@ public class BoardController {
     }
 
     @PostMapping("/{boardId}")
-    public String editBoard(@PathVariable Long boardId) {
-        return "edit board";
+    public ResponseEntity<BoardDetails> editBoard(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable(name = "boardId") Long boardId,
+            @RequestPart(name = "title") String title,
+            @RequestPart(name = "content") String content,
+            @RequestPart(name = "image") MultipartFile image
+    ) {
+        try {
+            UserInfoDto userDto = userService.findByEmail(userDetails.getUsername());
+            BoardDetails updatedBoard = boardService.update(boardId, userDto.id(), title, content, image);
+            return new ResponseEntity<>(updatedBoard, HttpStatus.OK);
+        } catch (NoSuchElementException | IOException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{boardId}")

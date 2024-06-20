@@ -64,4 +64,10 @@ public class Board extends BaseTimeEntity {
         this.commentCount = commentCount;
         this.user = user;
     }
+
+    public void update(String title, String content, String imageUrl) {
+        this.title = title;
+        this.content = content;
+        this.imageUrl = imageUrl;
+    }
 }

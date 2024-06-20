@@ -93,6 +93,20 @@ public class BoardServiceImpl implements BoardService {
         return BoardDetails.mapToDto(boardRepository.save(board));
     }
 
+    @Override
+    public void delete(Long id, Long userId)  throws IOException {
+        Optional<Board> findBoard = boardRepository.findById(id);
+        if (findBoard.isEmpty()) {
+            throw new NoSuchElementException("Board not exists");
+        }
+        Board board = findBoard.get();
+
+        if (!board.getUser().getId().equals(userId)) {
+            throw new AuthenticationException("Not valid user");
+        }
+        boardRepository.deleteById(id);
+    }
+
     private String generateImageUrl(MultipartFile image, String imagePath) throws IOException {
         if (!image.isEmpty()) {
             UUID uuid = UUID.randomUUID();

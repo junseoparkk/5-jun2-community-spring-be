@@ -12,4 +12,5 @@ public interface BoardService {
     List<BoardInfoDto> findAll();
     BoardDetails findById(Long id);
     BoardDetails update(Long id, Long userId, String title, String content, MultipartFile image) throws IOException;
+    void delete(Long id, Long userId) throws IOException;
 }

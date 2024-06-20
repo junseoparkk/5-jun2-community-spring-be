@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -85,8 +86,16 @@ public class BoardController {
     }
 
     @DeleteMapping("/{boardId}")
-    public String deleteBoard(@PathVariable Long boardId) {
-        return "delete board";
+    public ResponseEntity<String> deleteBoard(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable(name = "boardId") Long boardId) {
+        try {
+            UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
+            boardService.delete(boardId, findUser.id());
+            return new ResponseEntity<>("delete complete", HttpStatus.OK);
+        } catch (NoSuchElementException | IOException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/{boardId}/comments")

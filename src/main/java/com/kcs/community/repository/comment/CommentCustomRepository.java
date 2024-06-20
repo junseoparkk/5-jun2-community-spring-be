@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentCustomRepository {
     List<Comment> findCommentsByBoardId(Long boardId);
+    void deleteAllByUserId(Long userId);
 }

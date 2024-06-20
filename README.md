@@ -4,9 +4,9 @@
 - [X] 로그인 : `POST` /api/users/login
 - [X] 로그아웃 : `POST` /api/users/logout
 - [X] 회원 정보 조회 : `GET` /api/users/me
-- [ ] 회원 정보 수정 : `POST` /api/users/me
-- [ ] 회원 비밀번호 수정 : `POST` /api/users/password
-- [ ] 회원 탈퇴 : `DELETE` /api/users/me
+- [X] 회원 정보 수정 : `POST` /api/users/me
+- [X] 회원 비밀번호 수정 : `POST` /api/users/password
+- [X] 회원 탈퇴 : `DELETE` /api/users/me
 
 ## Board
 - [X] 게시글 목록 조회 : `GET` /api/boards

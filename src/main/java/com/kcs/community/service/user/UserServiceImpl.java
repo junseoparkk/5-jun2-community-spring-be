@@ -3,12 +3,16 @@ package com.kcs.community.service.user;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.dto.user.UserInfoDto;
+import com.kcs.community.entity.Board;
 import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
+import com.kcs.community.repository.board.BoardRepository;
+import com.kcs.community.repository.comment.CommentRepository;
 import com.kcs.community.repository.user.UserRepository;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +32,8 @@ public class UserServiceImpl implements UserService {
     @Value("${spring.servlet.multipart.location}")
     private String imagePath;
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -72,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserInfoDto updateInfo(UserInfoDto userDto, String updatedNickname, MultipartFile profileImg) {
         Optional<User> findUser = userRepository.findById(userDto.id());
         if (findUser.isEmpty()) {
@@ -104,6 +111,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserInfoDto updatePassword(UserInfoDto userDto, String updatePassword) {
         Optional<User> findUser = userRepository.findById(userDto.id());
         if (findUser.isEmpty()) {
@@ -123,6 +131,14 @@ public class UserServiceImpl implements UserService {
                 .build();
         userRepository.updateUser(saveUser.getId(), saveUser);
         return UserInfoDto.mapToDto(saveUser);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(UserInfoDto userDto) {
+        commentRepository.deleteAllByUserId(userDto.id());
+        boardRepository.deleteAllByUserId(userDto.id());
+        userRepository.deleteUser(userDto.id());
     }
 
     private void validateDuplicatedInfo(String email, String nickname) {

@@ -11,4 +11,5 @@ public interface UserService {
     UserInfoDto findByEmail(String email);
     UserInfoDto updateInfo(UserInfoDto userDto, String nickname, MultipartFile profileImg);
     UserInfoDto updatePassword(UserInfoDto userDto, String password);
+    void deleteById(UserInfoDto userDto);
 }

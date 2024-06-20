@@ -6,18 +6,28 @@ import com.kcs.community.entity.Comment;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
 public class CommentCustomRepositoryImpl implements CommentCustomRepository {
-    private final JPAQueryFactory queryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public List<Comment> findCommentsByBoardId(Long boardId) {
-        return queryFactory
+        return jpaQueryFactory
                 .selectFrom(comment)
                 .where(comment.board.id.eq(boardId))
                 .fetch();
+    }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        jpaQueryFactory
+                .delete(comment)
+                .where(comment.user.id.eq(userId))
+                .execute();
     }
 }

@@ -12,8 +12,8 @@
 - [X] 게시글 목록 조회 : `GET` /api/boards
 - [X] 게시글 상세 조회 : `GET` /api/boards/{boardId}
 - [X] 게시글 등록 : `POST` /api/boards
-- [ ] 게시글 수정 : `POST` /api/boards/{boardId}
-- [ ] 게시글 삭제 : `DELETE` /api/boards/{boardId}
+- [X] 게시글 수정 : `POST` /api/boards/{boardId}
+- [X] 게시글 삭제 : `DELETE` /api/boards/{boardId}
 
 ## Comment
 - [X] 댓글 조회 : `GET` /api/boards/{boardId}/comments

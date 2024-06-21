@@ -92,7 +92,7 @@ public class BoardController {
         try {
             UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
             boardService.delete(boardId, findUser.id());
-            return new ResponseEntity<>("delete complete", HttpStatus.OK);
+            return new ResponseEntity<>("board delete complete", HttpStatus.OK);
         } catch (NoSuchElementException | IOException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -100,8 +100,8 @@ public class BoardController {
 
     @PostMapping("/{boardId}/comments")
     public String writeComment(
-            @PathVariable(name = "boardId") Long boardId,
             @AuthenticationPrincipal UserDetails user,
+            @PathVariable(name = "boardId") Long boardId,
             @RequestParam(name = "content") String content
     ) {
         UserInfoDto findUser = userService.findByEmail(user.getUsername());
@@ -114,5 +114,21 @@ public class BoardController {
     public ResponseEntity<List<CommentInfoDto>> findAllComments(@PathVariable(name = "boardId") Long boardId) {
         List<CommentInfoDto> comments = commentService.findCommentsByBoardId(boardId);
         return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+    @PostMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<String> editComment(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable(name = "boardId") Long boardId,
+            @PathVariable(name = "commentId") Long commentId,
+            @RequestParam(name = "content") String content
+    ) {
+        try {
+            UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
+            commentService.update(findUser, boardId, commentId, content);
+            return new ResponseEntity<>("comment edit complete", HttpStatus.OK);
+        } catch (NoSuchElementException | AuthenticationException e) {
+            return new ResponseEntity<>("comment edit failed", HttpStatus.BAD_REQUEST);
+        }
     }
 }

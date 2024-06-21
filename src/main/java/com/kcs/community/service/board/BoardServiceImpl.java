@@ -11,10 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import javax.security.sasl.AuthenticationException;
-import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,26 +74,46 @@ public class BoardServiceImpl implements BoardService {
         return BoardDetails.mapToDto(board);
     }
 
+    @Transactional
     @Override
     public BoardDetails update(Long id, Long userId, String title, String content, MultipartFile image)
             throws IOException {
-        Optional<Board> findBoard = boardRepository.findById(id);
-        if (findBoard.isEmpty()) {
-            throw new NoSuchElementException("Board not exists");
-        }
-        Board board = findBoard.get();
-
-        if (!board.getUser().getId().equals(userId)) {
-            throw new AuthenticationException("Not valid user");
-        }
+        Board board = getBoard(id, userId);
         String imageUrl = generateImageUrl(image, imagePath);
+
+        if (!Objects.equals(userId, board.getUser().getId())) {
+            throw new IllegalStateException("Not valid User");
+        }
 
         board.update(title, content, imageUrl);
         return BoardDetails.mapToDto(boardRepository.save(board));
     }
 
+    @Transactional
     @Override
     public void delete(Long id, Long userId)  throws IOException {
+        Board board = getBoard(id, userId);
+
+        if (!userId.equals(board.getUser().getId())) {
+            throw new IllegalStateException("Not valid User");
+        }
+
+        boardRepository.deleteById(id);
+    }
+
+    private String generateImageUrl(MultipartFile image, String imagePath) throws IOException {
+        if (image.isEmpty()) {
+            return "";
+        }
+        UUID uuid = UUID.randomUUID();
+        String originalName = image.getOriginalFilename();
+        String fileName = uuid + originalName;
+        File saveFile = new File(imagePath, fileName);
+        image.transferTo(saveFile);
+        return imagePath + fileName;
+    }
+
+    private Board getBoard(Long id, Long userId) throws IOException {
         Optional<Board> findBoard = boardRepository.findById(id);
         if (findBoard.isEmpty()) {
             throw new NoSuchElementException("Board not exists");
@@ -102,20 +121,8 @@ public class BoardServiceImpl implements BoardService {
         Board board = findBoard.get();
 
         if (!board.getUser().getId().equals(userId)) {
-            throw new AuthenticationException("Not valid user");
+            throw new IllegalStateException("Not valid user");
         }
-        boardRepository.deleteById(id);
-    }
-
-    private String generateImageUrl(MultipartFile image, String imagePath) throws IOException {
-        if (!image.isEmpty()) {
-            UUID uuid = UUID.randomUUID();
-            String originalName = image.getOriginalFilename();
-            String fileName = uuid + originalName;
-            File saveFile = new File(imagePath, fileName);
-            image.transferTo(saveFile);
-            return imagePath + fileName;
-        }
-        return "";
+        return board;
     }
 }

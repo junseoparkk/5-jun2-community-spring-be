@@ -9,4 +9,5 @@ import java.util.List;
 public interface CommentService {
     void save(UserInfoDto user, BoardDetails board, String content);
     List<CommentInfoDto> findCommentsByBoardId(Long boardId);
+    void update(UserInfoDto userDto, Long boardId, Long commentId, String updatedContent);
 }

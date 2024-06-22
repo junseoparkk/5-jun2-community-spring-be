@@ -15,6 +15,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -25,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public void save(UserInfoDto user, BoardDetails board, String content) {
         Optional<User> findUser = userRepository.findById(user.id());
         if (findUser.isEmpty()) {
@@ -45,6 +47,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CommentInfoDto> findCommentsByBoardId(Long boardId) {
         Optional<Board> findBoard = boardRepository.findById(boardId);
         if (findBoard.isEmpty()) {
@@ -55,5 +58,23 @@ public class CommentServiceImpl implements CommentService {
         return findComments.stream()
                 .map(CommentInfoDto::mapToDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void update(UserInfoDto userDto, Long boardId, Long commentId, String updatedContent) {
+        Optional<Comment> findComment = commentRepository.findByBoardIdAndCommentId(boardId, commentId);
+        if (findComment.isEmpty()) {
+            throw new NoSuchElementException("Not exists comment");
+        }
+
+        Comment comment = findComment.get();
+
+        if (!comment.getUser().getId().equals(userDto.id())) {
+            throw new IllegalStateException("Not Valid User");
+        }
+
+        comment.update(updatedContent);
+        commentRepository.save(comment);
     }
 }

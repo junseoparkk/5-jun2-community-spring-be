@@ -3,9 +3,6 @@ package com.kcs.community.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,13 +11,11 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -41,15 +36,6 @@ public class S3ImageService {
             throw new IllegalArgumentException("image is empty");
         }
         return uploadImage(image, folder);
-    }
-
-    public void deleteImageFromS3(String imagePath) {
-        String key = getKeyFromImageAddress(imagePath);
-        try {
-            s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
-        } catch (S3Exception e) {
-            throw new RuntimeException("Could not delete file from S3", e);
-        }
     }
 
     private String uploadImage(MultipartFile image, String folder) {
@@ -103,14 +89,4 @@ public class S3ImageService {
         }
         return String.format("https://%s.s3.%s.amazonaws.com/%s/%s", bucketName, region, folder, s3FileName);
     }
-    private String getKeyFromImageAddress(String imageAddress) {
-        try {
-            URL url = new URL(imageAddress);
-            String decodingKey = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
-            return decodingKey.substring(1); // 맨 앞의 '/' 제거
-        } catch (IOException e) {
-            throw new RuntimeException("Error while decoding image address", e);
-        }
-    }
-
 }

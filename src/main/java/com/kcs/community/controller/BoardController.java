@@ -105,11 +105,6 @@ public class BoardController {
             @PathVariable(name = "boardId") Long boardId) {
         try {
             UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
-            String imagePath = boardService.findById(boardId).imageUrl();
-
-            if (!imagePath.isEmpty()) {
-                s3ImageService.deleteImageFromS3(imagePath);
-            }
 
             boardService.delete(boardId, findUser.id());
             return new ResponseEntity<>("board delete complete", HttpStatus.OK);

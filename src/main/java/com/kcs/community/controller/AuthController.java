@@ -4,6 +4,7 @@ import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.dto.user.UserInfoDto;
+import com.kcs.community.service.S3ImageService;
 import com.kcs.community.service.user.UserService;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +26,18 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
+    private final S3ImageService s3ImageService;
 
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(
             @RequestPart("email") String email,
             @RequestPart("password") String password,
             @RequestPart("nickname") String nickname,
-            @RequestPart(value = "profileImg", required = false)MultipartFile profileImg
+            @RequestPart(value = "profileImg", required = false) MultipartFile profileImg
             ) {
         try {
             SignupRequest request = new SignupRequest(email, password, nickname, profileImg);
+            s3ImageService.upload(profileImg, "profiles");
             SignupResponse response = userService.signup(request);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {

@@ -3,7 +3,6 @@ package com.kcs.community.service.user;
 import com.kcs.community.dto.user.SignupRequest;
 import com.kcs.community.dto.user.SignupResponse;
 import com.kcs.community.dto.user.UserInfoDto;
-import com.kcs.community.entity.Board;
 import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.board.BoardRepository;
@@ -12,7 +11,6 @@ import com.kcs.community.repository.user.UserRepository;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,7 +61,8 @@ public class UserServiceImpl implements UserService {
                 .build();
         userRepository.save(user);
 
-        log.info("signup success - email: {}, nickname: {}, role: {}", user.getEmail(), user.getNickname(), user.getRole());
+        log.info("signup success - email: {}, nickname: {}, role: {}", user.getEmail(), user.getNickname(),
+                user.getRole());
         // TO-BE builder 변경 예정
         return new SignupResponse(user.getEmail(), user.getNickname());
     }
@@ -139,6 +138,18 @@ public class UserServiceImpl implements UserService {
         commentRepository.deleteAllByUserId(userDto.id());
         boardRepository.deleteAllByUserId(userDto.id());
         userRepository.deleteUser(userDto.id());
+    }
+
+    @Override
+    public Boolean isDuplicatedEmail(String email) {
+        Optional<User> findUser = userRepository.findByEmail(email);
+        return findUser.isPresent();
+    }
+
+    @Override
+    public Boolean isDuplicatedNickname(String nickname) {
+        Optional<User> findUser = userRepository.findByNickname(nickname);
+        return findUser.isPresent();
     }
 
     private void validateDuplicatedInfo(String email, String nickname) {

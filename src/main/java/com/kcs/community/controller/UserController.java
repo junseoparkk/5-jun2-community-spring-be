@@ -2,6 +2,7 @@ package com.kcs.community.controller;
 
 import com.kcs.community.auth.CustomUserDetails;
 import com.kcs.community.dto.user.UserInfoDto;
+import com.kcs.community.service.S3ImageService;
 import com.kcs.community.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final S3ImageService s3ImageService;
 
     @GetMapping("/me")
     public ResponseEntity<UserInfoDto> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UserInfoDto userDto = userService.findByEmail(userDetails.getUsername());
-        log.info("findUser email: {}, nickname: {}, profileUrl: {}", userDto.email(), userDto.nickname(), userDto.profileUrl());
+        log.info("findUser email: {}, nickname: {}, profileUrl: {}", userDto.email(), userDto.nickname(),
+                userDto.profileUrl());
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -35,12 +38,13 @@ public class UserController {
     public ResponseEntity<UserInfoDto> updateUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart(name = "nickname", required = false) String nickname,
-            @RequestPart(name = "profileImg", required = false)MultipartFile profileImg
+            @RequestPart(name = "profileImg", required = false) MultipartFile profileImg
     ) {
         UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
         if (nickname == null && profileImg.isEmpty()) {
             return new ResponseEntity<>(findUser, HttpStatus.OK);
         }
+        s3ImageService.upload(profileImg, "profiles");
         UserInfoDto updatedUser = userService.updateInfo(findUser, nickname, profileImg);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
@@ -61,7 +65,24 @@ public class UserController {
     @DeleteMapping("/me")
     public String deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
         UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
+
         userService.deleteById(findUser);
         return "delete user ok";
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<?> validateDuplicatedEmail(@RequestPart(name = "email") String email) {
+        if (userService.isDuplicatedEmail(email)) {
+            return new ResponseEntity<>("duplicated email", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("valid email", HttpStatus.OK);
+    }
+
+    @GetMapping("/nickname")
+    public ResponseEntity<?> validateDuplicatedNickname(@RequestPart(name = "nickname") String nickname) {
+        if (userService.isDuplicatedNickname(nickname)) {
+            return new ResponseEntity<>("duplicated nickname", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("valid nickname", HttpStatus.OK);
     }
 }

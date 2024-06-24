@@ -7,6 +7,7 @@ import com.kcs.community.entity.Board;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.board.BoardRepository;
 import com.kcs.community.repository.user.UserRepository;
+import com.kcs.community.service.S3ImageService;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,15 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
-    @Value("${spring.servlet.multipart.location}")
-    private String imagePath;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
 
     @Transactional
     @Override
-    public BoardInfoDto save(UserInfoDto user, String title, String content, MultipartFile image) throws IOException {
-        String imageUrl = generateImageUrl(image, imagePath);
+    public BoardInfoDto save(UserInfoDto user, String title, String content, String imagePath) {
         Optional<User> findUser = userRepository.findById(user.id());
 
         if (findUser.isEmpty()) {
@@ -43,7 +40,7 @@ public class BoardServiceImpl implements BoardService {
         Board board = Board.builder()
                 .title(title)
                 .content(content)
-                .imageUrl(imageUrl)
+                .imageUrl(imagePath)
                 .likeCount(0L)
                 .viewCount(0L)
                 .commentCount(0L)
@@ -76,16 +73,14 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional
     @Override
-    public BoardDetails update(Long id, Long userId, String title, String content, MultipartFile image)
-            throws IOException {
+    public BoardDetails update(Long id, Long userId, String title, String content, String imagePath) {
         Board board = getBoard(id, userId);
-        String imageUrl = generateImageUrl(image, imagePath);
 
         if (!Objects.equals(userId, board.getUser().getId())) {
             throw new IllegalStateException("Not valid User");
         }
 
-        board.update(title, content, imageUrl);
+        board.update(title, content, imagePath);
         return BoardDetails.mapToDto(boardRepository.save(board));
     }
 
@@ -101,19 +96,7 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.deleteById(id);
     }
 
-    private String generateImageUrl(MultipartFile image, String imagePath) throws IOException {
-        if (image.isEmpty()) {
-            return "";
-        }
-        UUID uuid = UUID.randomUUID();
-        String originalName = image.getOriginalFilename();
-        String fileName = uuid + originalName;
-        File saveFile = new File(imagePath, fileName);
-        image.transferTo(saveFile);
-        return imagePath + fileName;
-    }
-
-    private Board getBoard(Long id, Long userId) throws IOException {
+    private Board getBoard(Long id, Long userId) {
         Optional<Board> findBoard = boardRepository.findById(id);
         if (findBoard.isEmpty()) {
             throw new NoSuchElementException("Board not exists");

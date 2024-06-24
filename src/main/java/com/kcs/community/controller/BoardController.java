@@ -4,6 +4,7 @@ import com.kcs.community.dto.board.BoardDetails;
 import com.kcs.community.dto.board.BoardInfoDto;
 import com.kcs.community.dto.board.CommentInfoDto;
 import com.kcs.community.dto.user.UserInfoDto;
+import com.kcs.community.service.S3ImageService;
 import com.kcs.community.service.board.BoardService;
 import com.kcs.community.service.comment.CommentService;
 import com.kcs.community.service.user.UserService;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -36,18 +36,25 @@ public class BoardController {
     private final BoardService boardService;
     private final CommentService commentService;
     private final UserService userService;
+    private final S3ImageService s3ImageService;
 
     @PostMapping
     public ResponseEntity<BoardInfoDto> writeBoard(
             @AuthenticationPrincipal UserDetails user,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         UserInfoDto findUser = userService.findByEmail(user.getUsername());
 
         log.info("user: {}, title: {}, content: {}", findUser.email(), title, content);
 
-        BoardInfoDto response = boardService.save(findUser, title, content, image);
+        BoardInfoDto response;
+        if (image.isEmpty()) {
+            response = boardService.save(findUser, title, content, null);
+        } else {
+            String imagePath = s3ImageService.upload(image, "boards");
+            response = boardService.save(findUser, title, content, imagePath);
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -78,9 +85,16 @@ public class BoardController {
     ) {
         try {
             UserInfoDto userDto = userService.findByEmail(userDetails.getUsername());
-            BoardDetails updatedBoard = boardService.update(boardId, userDto.id(), title, content, image);
+
+            BoardDetails updatedBoard;
+            if (image.isEmpty()) {
+                updatedBoard = boardService.update(boardId, userDto.id(), title, content, null);
+            } else {
+                String imagePath = s3ImageService.upload(image, "boards");
+                updatedBoard = boardService.update(boardId, userDto.id(), title, content, imagePath);
+            }
             return new ResponseEntity<>(updatedBoard, HttpStatus.OK);
-        } catch (NoSuchElementException | IOException e) {
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
@@ -91,6 +105,12 @@ public class BoardController {
             @PathVariable(name = "boardId") Long boardId) {
         try {
             UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
+            String imagePath = boardService.findById(boardId).imageUrl();
+
+            if (!imagePath.isEmpty()) {
+                s3ImageService.deleteImageFromS3(imagePath);
+            }
+
             boardService.delete(boardId, findUser.id());
             return new ResponseEntity<>("board delete complete", HttpStatus.OK);
         } catch (NoSuchElementException | IOException e) {

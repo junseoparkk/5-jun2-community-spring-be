@@ -18,5 +18,5 @@
 ## Comment
 - [X] 댓글 조회 : `GET` /api/boards/{boardId}/comments
 - [X] 댓글 등록 : `POST` /api/boards/{boardId}/comments
-- [ ] 댓글 수정 : `POST` /api/boards/{boardId}/comments/{commentId}
-- [ ] 댓글 삭제 : `DELETE` /api/boards/{boardId}/comments/{commentId}
+- [X] 댓글 수정 : `POST` /api/boards/{boardId}/comments/{commentId}
+- [X] 댓글 삭제 : `DELETE` /api/boards/{boardId}/comments/{commentId}

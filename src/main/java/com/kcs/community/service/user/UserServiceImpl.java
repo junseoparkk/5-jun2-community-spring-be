@@ -42,19 +42,12 @@ public class UserServiceImpl implements UserService {
         String nickname = request.nickname();
 
         validateDuplicatedInfo(email, nickname);
-        String profileUrl = null;
-        try {
-            profileUrl = generateProfileUrl(request.profileImg());
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new IllegalArgumentException("Profile image upload failed");
-        }
 
         User user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .nickname(request.nickname())
-                .profileUrl(profileUrl)
+                .profileUrl(imagePath)
                 .role(RoleType.USER)
                 .createdAt(LocalDateTime.now().withNano(0))
                 .updatedAt(LocalDateTime.now().withNano(0))

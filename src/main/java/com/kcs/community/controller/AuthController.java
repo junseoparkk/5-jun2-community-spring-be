@@ -31,6 +31,8 @@ public class AuthController {
     ) {
         try {
             String imagePath = s3ImageService.upload(profileImg, "profiles");
+            log.info("imagePath: {}", imagePath);
+
             SignupRequest request = new SignupRequest(email, password, nickname, imagePath);
             SignupResponse response = userService.signup(request);
             return new ResponseEntity<>(response, HttpStatus.OK);

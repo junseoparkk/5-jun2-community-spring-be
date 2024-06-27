@@ -62,8 +62,7 @@ public class S3ImageService {
     }
 
     private String uploadImageToS3(MultipartFile image, String folder) throws IOException {
-        String originalName = image.getOriginalFilename();
-        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalName;
+        String s3FileName = UUID.randomUUID().toString().substring(0, 15);
 
         InputStream inputStream = image.getInputStream();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(inputStream.readAllBytes());

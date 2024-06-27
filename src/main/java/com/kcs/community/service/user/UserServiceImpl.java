@@ -8,27 +8,20 @@ import com.kcs.community.entity.User;
 import com.kcs.community.repository.board.BoardRepository;
 import com.kcs.community.repository.comment.CommentRepository;
 import com.kcs.community.repository.user.UserRepository;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Value("${spring.servlet.multipart.location}")
-    private String imagePath;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
@@ -47,7 +40,7 @@ public class UserServiceImpl implements UserService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .nickname(request.nickname())
-                .profileUrl(imagePath)
+                .profileUrl(request.imagePath())
                 .role(RoleType.USER)
                 .createdAt(LocalDateTime.now().withNano(0))
                 .updatedAt(LocalDateTime.now().withNano(0))
@@ -71,19 +64,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserInfoDto updateInfo(UserInfoDto userDto, String updatedNickname, MultipartFile profileImg) {
+    public UserInfoDto updateInfo(UserInfoDto userDto, String updatedNickname, String imagePath) {
         Optional<User> findUser = userRepository.findById(userDto.id());
         if (findUser.isEmpty()) {
             throw new NoSuchElementException("Not Exists User");
-        }
-
-        // TO-BE 기존 프로필 이미지 삭제 로직 필요
-        String updatedProfileUrl = null;
-        try {
-            updatedProfileUrl = generateProfileUrl(profileImg);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new IllegalArgumentException("Profile image upload failed");
         }
 
         User user = findUser.get();
@@ -92,7 +76,7 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .nickname(updatedNickname)
-                .profileUrl(updatedProfileUrl)
+                .profileUrl(imagePath)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(LocalDateTime.now().withNano(0))
                 .role(user.getRole())
@@ -153,18 +137,5 @@ public class UserServiceImpl implements UserService {
             return;
         }
         throw new IllegalArgumentException("Duplicated User Information Error");
-    }
-
-    private String generateProfileUrl(MultipartFile profileImg) throws IOException {
-        String savedPath = imagePath + "/profile/";
-        if (!profileImg.isEmpty()) {
-            UUID uuid = UUID.randomUUID();
-            String originalName = profileImg.getOriginalFilename();
-            String fileName = uuid + originalName;
-            File saveFile = new File(savedPath, fileName);
-            profileImg.transferTo(saveFile);
-            return savedPath + fileName;
-        }
-        return "";
     }
 }

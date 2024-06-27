@@ -44,8 +44,8 @@ public class UserController {
         if (nickname == null && profileImg.isEmpty()) {
             return new ResponseEntity<>(findUser, HttpStatus.OK);
         }
-        s3ImageService.upload(profileImg, "profiles");
-        UserInfoDto updatedUser = userService.updateInfo(findUser, nickname, profileImg);
+        String imagePath = s3ImageService.upload(profileImg, "profiles");
+        UserInfoDto updatedUser = userService.updateInfo(findUser, nickname, imagePath);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 

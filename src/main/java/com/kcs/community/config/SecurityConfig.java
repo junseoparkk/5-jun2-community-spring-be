@@ -1,11 +1,10 @@
 package com.kcs.community.config;
 
 import com.kcs.community.auth.CustomLogoutFilter;
+import com.kcs.community.auth.LoginFilter;
 import com.kcs.community.auth.jwt.JwtFilter;
 import com.kcs.community.auth.jwt.JwtUtil;
-import com.kcs.community.auth.LoginFilter;
 import com.kcs.community.repository.RefreshRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +22,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -58,12 +56,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request
                                 .requestMatchers("/api/auth/signup", "/api/auth/login", "/error").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/boards/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/boards/**").authenticated()
                                 .requestMatchers("/reissue").permitAll()
+                                .requestMatchers("/healthcheck", "env").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository),
+                .addFilterAt(
+                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class)
                 .build();

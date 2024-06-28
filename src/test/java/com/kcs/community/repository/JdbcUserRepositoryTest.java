@@ -3,8 +3,10 @@ package com.kcs.community.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.user.JdbcUserRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +41,9 @@ public class JdbcUserRepositoryTest {
                 .password("testPassword!")
                 .nickname("testName")
                 .profileUrl("http://profile.com/test")
+                .role(RoleType.USER)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         //when
@@ -61,6 +66,9 @@ public class JdbcUserRepositoryTest {
 
         //when
         List<User> users = repository.findAll();
+        for (User user : users) {
+            System.out.println(user.toString());
+        }
 
         //then
         assertThat(users.size()).isEqualTo(2);
@@ -101,6 +109,9 @@ public class JdbcUserRepositoryTest {
                 .password("testPassword! - " + number)
                 .nickname("testName - " + number)
                 .profileUrl("http://profile.com/test - " + number)
+                .role(RoleType.USER)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         return user;
     }

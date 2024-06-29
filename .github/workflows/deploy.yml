@@ -21,16 +21,14 @@ jobs:
           distribution: 'temurin'
 
       - name: Make application.yml
-        working-directory: ./src/main/resources
         run: |
-          touch ./application.yml
-          echo ${{secrets.APPLICATION_SETTINGS}} | base64 --decode > ./application.yml
+          touch ./src/main/resources/application.yml
+          echo ${{secrets.APPLICATION_SETTINGS}} | base64 --decode > ./src/main/resources/application.yml
 
       - name: Make application-secret.yml
-        working-directory: ./src/main/resources
         run: |
-          touch ./application-secret.yml
-          echo ${{secrets.APPLICATION_SECRET}} | base64 --decode > ./application-secret.yml
+          touch ./src/main/resources/application-secret.yml
+          echo ${{secrets.APPLICATION_SECRET}} | base64 --decode > ./src/main/resources/application-secret.yml
 
       - name: Verify secret file exists
         run: ls -l ./src/main/resources/application-secret.yml

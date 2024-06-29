@@ -11,4 +11,4 @@ WORKDIR /app
 
 COPY ${JAR_FILE} app.jar
 
-ENTRYPOINT ["java", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-Dserver.env=${SERVER_ENV}", "-jar", "app.jar"]
+ENTRYPOINT ["sudo", 'java", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "-Dserver.env=${SERVER_ENV}", "-jar", "app.jar"]

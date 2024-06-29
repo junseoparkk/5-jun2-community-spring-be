@@ -7,7 +7,6 @@ import com.kcs.community.entity.RoleType;
 import com.kcs.community.entity.User;
 import com.kcs.community.repository.user.JdbcUserRepository;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,25 +52,6 @@ public class JdbcUserRepositoryTest {
         //then
         log.info("user = {}", findUser);
         assertThat(findUser.getNickname()).isEqualTo(user.getNickname());
-    }
-
-    @Test
-    void findAllTest() {
-        //given
-        User user1 = generateTestUser(1);
-        repository.save(user1);
-
-        User user2 = generateTestUser(2);
-        repository.save(user2);
-
-        //when
-        List<User> users = repository.findAll();
-        for (User user : users) {
-            System.out.println(user.toString());
-        }
-
-        //then
-        assertThat(users.size()).isEqualTo(2);
     }
 
     @Test

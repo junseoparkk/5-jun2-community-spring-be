@@ -36,6 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 
+### config ###
+application.yml
+application-test.yml
+application-private.yml
 
 ### QueryDSL generated sources
 generated/

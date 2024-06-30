@@ -22,15 +22,15 @@ jobs:
 
       - name: Make application.yml
         run: |
-          #          mkdir -p ./src/main/resources/
-          #          touch ./src/main/resources/application.yml
-               echo ${{secrets.APPLICATION_SETTINGS}} | base64 --decode > ./src/main/resources/application.yml
+          mkdir -p ./src/main/resources/
+          touch ./src/main/resources/application.yml
+          echo ${{secrets.APPLICATION_SETTINGS}} | base64 --decode > ./src/main/resources/application.yml
 
       - name: Make application-secret.yml
         run: |
-          #          mkdir -p ./src/main/resources/
-          #          touch ./src/main/resources/application-secret.yml
-               echo ${{secrets.APPLICATION_SECRET}} | base64 --decode > ./src/main/resources/application-secret.yml
+          mkdir -p ./src/main/resources/
+          touch ./src/main/resources/application-secret.yml
+          echo ${{secrets.APPLICATION_SECRET}} | base64 --decode > ./src/main/resources/application-secret.yml
 
       - name: Verify secret file exists
         run: ls -l ./src/main/resources/application-secret.yml

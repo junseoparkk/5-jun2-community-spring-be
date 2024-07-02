@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/boards/**").authenticated()
                                 .requestMatchers("/reissue").permitAll()
                                 .requestMatchers("/healthcheck", "env").permitAll()
+                                .requestMatchers("/api/users/email", "/api/users/nickname").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(

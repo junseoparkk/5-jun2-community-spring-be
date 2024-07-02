@@ -74,16 +74,24 @@ public class UserController {
 
     @GetMapping("/email")
     public ResponseEntity<?> validateDuplicatedEmail(@RequestPart(name = "email") String email) {
-        if (userService.isDuplicatedEmail(email)) {
-            return new ResponseEntity<>("duplicated email", HttpStatus.BAD_REQUEST);
+        try {
+            if (userService.isDuplicatedEmail(email)) {
+                return new ResponseEntity<>("duplicated email", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            log.info("not exist user");
         }
         return new ResponseEntity<>("valid email", HttpStatus.OK);
     }
 
     @GetMapping("/nickname")
     public ResponseEntity<?> validateDuplicatedNickname(@RequestPart(name = "nickname") String nickname) {
-        if (userService.isDuplicatedNickname(nickname)) {
-            return new ResponseEntity<>("duplicated nickname", HttpStatus.BAD_REQUEST);
+        try {
+            if (userService.isDuplicatedNickname(nickname)) {
+                return new ResponseEntity<>("duplicated nickname", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            log.info("not exist user");
         }
         return new ResponseEntity<>("valid nickname", HttpStatus.OK);
     }

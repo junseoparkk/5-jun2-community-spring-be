@@ -63,11 +63,13 @@ public class UserController {
     }
 
     @DeleteMapping("/me")
-    public String deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
         UserInfoDto findUser = userService.findByEmail(userDetails.getUsername());
-
+        if (findUser.id() == null) {
+            return new ResponseEntity<>("not exist user", HttpStatus.BAD_REQUEST);
+        }
         userService.deleteById(findUser);
-        return "delete user ok";
+        return new ResponseEntity<>("delete user success", HttpStatus.OK);
     }
 
     @GetMapping("/email")

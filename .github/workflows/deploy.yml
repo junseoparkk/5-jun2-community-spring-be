@@ -60,7 +60,7 @@ jobs:
         run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
 
       - name: Docker run new container
-        run: sudo docker run --name be-server -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/jun2_community_be:latest
+        run: sudo docker run --rm --name be-server -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/jun2_community_be:latest
 
       - name: Delete old docker image
         run: sudo docker system prune -f
